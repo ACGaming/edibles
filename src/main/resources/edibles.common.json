@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "mixins.edibles.refmap.json",
   "mixins": [
-      "MixinJelliedFood"
+      "MixinJelliedFood",
+      "MixinEdibleItems"
   ],
   "injectors": {
     "defaultRequire": 1

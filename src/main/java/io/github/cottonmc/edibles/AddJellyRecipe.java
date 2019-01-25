@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.crafting.SpecialCraftingRecipe;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -62,5 +63,4 @@ public class AddJellyRecipe extends SpecialCraftingRecipe {
 	public RecipeSerializer<?> getSerializer() {
 		return Edibles.ADD_JELLY_SERIALIZER;
 	}
-
 }
