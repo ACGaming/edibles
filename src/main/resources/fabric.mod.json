@@ -1,0 +1,12 @@
+{
+  "id": "edibles",
+  "name": "Edibles",
+  "version": "1.0.0",
+  "side": "universal",
+  "initializers": [
+    "io.github.cottonmc.edibles.Edibles"
+    ],
+    "mixins": {
+        "common": "edibles.common.json"
+    }
+}

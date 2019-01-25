@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.cottonmc.edibles.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "mixins.edibles.refmap.json",
+  "mixins": [
+      "MixinJelliedFood"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
