@@ -5,7 +5,8 @@
   "refmap": "mixins.edibles.refmap.json",
   "mixins": [
       "MixinJelliedFood",
-      "MixinEdibleItems"
+      "MixinEdibleItems",
+      "MixinOmnivore"
   ],
   "injectors": {
     "defaultRequire": 1

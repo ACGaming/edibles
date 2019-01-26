@@ -1,0 +1,68 @@
+package io.github.cottonmc.edibles.mixins;
+
+import io.github.cottonmc.edibles.Edibles;
+import net.minecraft.advancement.criterion.Criterions;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.stat.Stats;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
+import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+@Mixin(Item.class)
+public class MixinOmnivore {
+
+	@Inject(method = "getUseAction", at = @At("RETURN"), cancellable = true)
+	public void getOmnivoreUseAction(ItemStack stack, CallbackInfoReturnable cir) {
+		if (Edibles.config.omnivoreEnabled) cir.setReturnValue(UseAction.EAT);
+	}
+
+	@Inject(method = "getMaxUseTime", at = @At("RETURN"), cancellable = true)
+	public void getOmnivoreUseTime(ItemStack stack, CallbackInfoReturnable cir) {
+		if (Edibles.config.omnivoreEnabled) cir.setReturnValue(48);
+	}
+
+	@Inject(method = "use", at = @At("HEAD"), cancellable = true)
+	public void omnivoreUse(World world, PlayerEntity player, Hand hand, CallbackInfoReturnable cir) {
+		if (Edibles.config.omnivoreEnabled) {
+			ItemStack stack = player.getStackInHand(hand);
+			if (player.canConsume(false)) {
+				player.setCurrentHand(hand);
+				cir.setReturnValue(new TypedActionResult(ActionResult.SUCCESS, stack));
+			} else {
+				cir.setReturnValue(new TypedActionResult(ActionResult.FAILURE, stack));
+			}
+		}
+	}
+
+	@Inject(method = "onItemFinishedUsing", at = @At("HEAD"), cancellable = true)
+	public void getOmnivoreOnItemFinishedUsing(ItemStack stack, World world, LivingEntity entity, CallbackInfoReturnable cir) {
+		if (Edibles.config.omnivoreEnabled) {
+			if (entity instanceof PlayerEntity) {
+				PlayerEntity player = (PlayerEntity) entity;
+				player.getHungerManager().add(Edibles.config.omnivoreFoodRestore, Edibles.config.omnivoreSaturationRestore);
+				world.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYER, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
+				player.incrementStat(Stats.USED.getOrCreateStat((Item) (Object) this));
+				if (player instanceof ServerPlayerEntity) {
+					Criterions.CONSUME_ITEM.handle((ServerPlayerEntity) player, stack);
+				}
+			}
+
+			int damage = Edibles.config.omnivoreItemDamage;
+			if (stack.hasDurability() && damage > 0) stack.applyDamage(damage, entity);
+			else stack.subtractAmount(1);
+			cir.setReturnValue(stack);
+		}
+	}
+}
