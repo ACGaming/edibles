@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -48,12 +49,24 @@ public class MixinOmnivore {
 
 	@Inject(method = "onItemFinishedUsing", at = @At("HEAD"), cancellable = true)
 	public void getOmnivoreOnItemFinishedUsing(ItemStack stack, World world, LivingEntity entity, CallbackInfoReturnable cir) {
-		if (Edibles.config.omnivoreEnabled) {
+		if (stack.getItem() == Items.field_17534) { // cake
+			if (entity instanceof PlayerEntity) {
+				PlayerEntity player = (PlayerEntity) entity;
+				player.getHungerManager().add(14, 2.8f);
+				world.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYER, 0.5F, world.random.nextFloat() * 0.1F + 0.8F);
+				player.incrementStat(Stats.CUSTOM.getOrCreateStat(Stats.EAT_CAKE_SLICE), 7);
+				if (player instanceof ServerPlayerEntity) {
+					Criterions.CONSUME_ITEM.handle((ServerPlayerEntity) player, stack);
+				}
+			}
+			stack.subtractAmount(1);
+			cir.setReturnValue(stack);
+		} else if (Edibles.config.omnivoreEnabled) {
 			if (entity instanceof PlayerEntity) {
 				PlayerEntity player = (PlayerEntity) entity;
 				player.getHungerManager().add(Edibles.config.omnivoreFoodRestore, Edibles.config.omnivoreSaturationRestore);
 				world.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYER, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
-				player.incrementStat(Stats.USED.getOrCreateStat((Item) (Object) this));
+				player.incrementStat(Stats.USED.getOrCreateStat((Item)(Object)this));
 				if (player instanceof ServerPlayerEntity) {
 					Criterions.CONSUME_ITEM.handle((ServerPlayerEntity) player, stack);
 				}
@@ -65,4 +78,5 @@ public class MixinOmnivore {
 			cir.setReturnValue(stack);
 		}
 	}
+
 }
