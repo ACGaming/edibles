@@ -71,6 +71,9 @@ public class MixinOmnivore {
 					Criterions.CONSUME_ITEM.handle((ServerPlayerEntity) player, stack);
 				}
 			}
+			if (stack.getItem() == Items.field_8626 || stack.getItem() == Items.TNT_MINECART) { // TNT/TNT minecart
+				world.createExplosion(null, entity.x, entity.y+1, entity.z, 1.5f, false);
+			}
 
 			int damage = Edibles.config.omnivoreItemDamage;
 			if (stack.hasDurability() && damage > 0) stack.applyDamage(damage, entity);
