@@ -25,6 +25,10 @@ archivesBaseName = "edibles"
 group = "io.github.cottonmc"
 version = "1.0.0+19w04a"
 
+minecraft {
+	refmapName = 'mixins.edibles.refmap.json'
+}
+
 repositories {
 	mavenCentral()
 	maven {

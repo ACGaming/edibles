@@ -1,11 +1,11 @@
 package io.github.cottonmc.edibles;
 
-import blue.endless.jankson.Comment;
+import io.github.cottonmc.repackage.blue.endless.jankson.Comment;
 import io.github.cottonmc.cotton.config.annotations.ConfigFile;
 
 @ConfigFile(name = "Edibles")
 public class EdiblesConfig {
-
+	
 	@Comment(value="Allow eating of (nearly) any item in the game.\nWhether this works on a given item will depend on how it's coded.")
 	public boolean omnivoreEnabled = false;
 

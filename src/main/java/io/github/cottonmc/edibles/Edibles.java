@@ -19,7 +19,7 @@ public class Edibles implements ModInitializer {
     public static ModLogger logger = new ModLogger("Edibles", "EDIBLES");
     public static EdiblesConfig config;
 
-    public static final Item JELLY = register("jelly", new FoodItem(1, 0.25f, false, new Item.Settings().itemGroup(ItemGroup.FOOD).recipeRemainder(Items.GLASS_BOTTLE)));
+    public static final Item JELLY = register("jelly", new JellyItem());
 
     public static RecipeType<AddJellyRecipe> ADD_JELLY = register("add_jelly");
     public static RecipeSerializer<AddJellyRecipe> ADD_JELLY_SERIALIZER = register("add_jelly", new SpecialRecipeSerializer<>(AddJellyRecipe::new));
