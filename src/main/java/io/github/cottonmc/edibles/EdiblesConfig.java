@@ -5,7 +5,10 @@ import io.github.cottonmc.cotton.config.annotations.ConfigFile;
 
 @ConfigFile(name = "Edibles")
 public class EdiblesConfig {
-	
+
+	@Comment(value="Make iron and gold nuggets edible.")
+	public boolean edibleNuggets = false;
+
 	@Comment(value="Allow eating of (nearly) any item in the game.\n" +
 			"Whether this works on a given item will depend on how it's coded.")
 	public boolean omnivoreEnabled = false;
