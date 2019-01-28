@@ -1,8 +1,5 @@
 package io.github.cottonmc.edibles;
 
-import io.github.cottonmc.cotton.config.ConfigManager;
-import io.github.cottonmc.cotton.logging.Ansi;
-import io.github.cottonmc.cotton.logging.ModLogger;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.Recipe;
@@ -13,7 +10,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class Edibles implements ModInitializer {
-    public static ModLogger logger = new ModLogger("Edibles", "EDIBLES");
     public static EdiblesConfig config;
 
     public static final Item JELLY = register("jelly", new JellyItem());
@@ -45,10 +41,9 @@ public class Edibles implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        logger.setPrefixFormat(Ansi.Blue);
-        config = ConfigManager.loadConfig(EdiblesConfig.class);
+        config = ConfigManager.load(EdiblesConfig.class);
         if (config.omnivoreEnabled) {
-            logger.info("You're feeling hungry...");
+            System.out.println("You're feeling hungry...");
         }
     }
 }

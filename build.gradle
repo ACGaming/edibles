@@ -43,7 +43,4 @@ dependencies {
 	modCompile "net.fabricmc:fabric-loader:0.3.3.101"
 	modCompile "net.fabricmc:fabric:0.1.4.79"
 	compile "blue.endless:jankson:1.1.0"
-
-	//TODO: change to ini-like config when that gets added to Fabric
-	modCompile "io.github.cottonmc:cotton:0.0.2+19w03a-SNAPSHOT"
 }

@@ -13,7 +13,6 @@ public class JellyItem extends FoodItem {
 	@Override
 	public ItemStack onItemFinishedUsing(ItemStack stack, World world, LivingEntity entity) {
 		super.onItemFinishedUsing(stack, world, entity);
-		Edibles.logger.info("Output: %s", stack);
 		if (stack.getAmount() >= 1 && entity instanceof PlayerEntity) {
 			PlayerEntity player = (PlayerEntity)entity;
 			player.inventory.insertStack(new ItemStack(Items.GLASS_BOTTLE));
