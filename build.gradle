@@ -12,10 +12,12 @@ buildscript {
 
 	}
 	dependencies {
+		classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
 		classpath "net.fabricmc:fabric-loom:0.2.0-SNAPSHOT"
 	}
 }
 
+apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: net.fabricmc.loom.LoomGradlePlugin
 
 sourceCompatibility = 1.8
@@ -23,7 +25,7 @@ targetCompatibility = 1.8
 
 archivesBaseName = "edibles"
 group = "io.github.cottonmc"
-version = "1.0.0+19w04a"
+version = "1.0.0+19w04b"
 
 minecraft {
 	refmapName = 'mixins.edibles.refmap.json'
@@ -32,16 +34,12 @@ minecraft {
 repositories {
 	//mavenCentral()
 	mavenLocal()
-	maven {
-		//cotton
-		url "http://server.bbkr.space:8081/artifactory/libs-snapshot"
-	}
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:19w04a"
-	mappings "net.fabricmc:yarn:19w04a.2"
-	modCompile "net.fabricmc:fabric-loader:0.3.3.101"
+	minecraft "com.mojang:minecraft:19w04b"
+	mappings "net.fabricmc:yarn:19w04b.2"
+	modCompile "net.fabricmc:fabric-loader:0.3.3.102"
 	modCompile "net.fabricmc:fabric:0.1.4.79"
-	compile "blue.endless:jankson:1.1.1-SNAPSHOT"
+	shadow "blue.endless:jankson:1.1.1-SNAPSHOT"
 }

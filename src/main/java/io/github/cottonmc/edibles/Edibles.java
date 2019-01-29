@@ -44,6 +44,7 @@ public class Edibles implements ModInitializer {
         config = ConfigManager.load(EdiblesConfig.class);
         if (config.omnivoreEnabled) {
             System.out.println("You're feeling hungry...");
+            System.out.println("Be warned, this might cause weird behavior!");
         }
     }
 }
