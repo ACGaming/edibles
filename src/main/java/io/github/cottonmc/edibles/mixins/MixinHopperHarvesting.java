@@ -3,10 +3,12 @@ package io.github.cottonmc.edibles.mixins;
 import io.github.cottonmc.edibles.Edibles;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
+import net.minecraft.block.SweetBerryBushBlock;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.sortme.Hopper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -18,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(HopperBlockEntity.class)
@@ -30,42 +33,67 @@ public abstract class MixinHopperHarvesting {
 			BlockPos pos = new BlockPos(hopper.getHopperX(), hopper.getHopperY(), hopper.getHopperZ());
 			BlockState state = world.getBlockState(pos.offset(Direction.UP, 2));
 			if (state.getBlock() instanceof CropBlock) {
-				CropBlock crop = (CropBlock) state.getBlock();
-				if (crop.getCropAgeMaximum() == state.get(crop.getAgeProperty())) {
-					Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
-
-					int madeTransfers = 0;
-					List<ItemStack> results = state.getDroppedStacks(new LootContext
-							.Builder(world.getServer().getWorld(world.dimension.getType()))
-							.put(Parameters.POSITION, pos).put(Parameters.TOOL, ItemStack.EMPTY));
-					for (int i = 0; i < results.size(); i++) {
-						boolean inserted = false;
-						for (int j = 0; j < inv.getInvSize(); j++) {
-							if (!inserted) {
-								ItemStack stack = results.get(i);
-								ItemStack existing = inv.getInvStack(j);
-								if (!existing.isEmpty()) {
-									if (existing.getItem() != stack.getItem()) continue;
-									else stack.addAmount(existing.getAmount());
-								}
-
-								inv.setInvStack(j, stack);
-								madeTransfers++;
-								inserted = true;
-							}
-						}
-					}
-					if (madeTransfers > 0) {
-						if (madeTransfers < results.size()) {
-							for (int i = madeTransfers; i < results.size(); i++) {
-								world.spawnEntity(new ItemEntity(world, pos.getX(), pos.getY() + 2, pos.getZ(), results.get(i)));
-							}
-						}
-						world.setBlockState(pos.offset(Direction.UP, 2), state.with(crop.getAgeProperty(), 0));
-					}
-					cir.setReturnValue(true);
-				}
+				if (harvestCrop(world, pos, state)) cir.setReturnValue(true);
+			} else if (state.getBlock() instanceof SweetBerryBushBlock) {
+				if (harvestBerries(world, pos, state)) cir.setReturnValue(true);
 			}
+		}
+	}
+
+	private static boolean harvestCrop(World world, BlockPos pos, BlockState state) {
+		CropBlock crop = (CropBlock) state.getBlock();
+		if (crop.getCropAgeMaximum() == state.get(crop.getAgeProperty())) {
+			Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+			List<ItemStack> results = state.getDroppedStacks(new LootContext
+					.Builder(world.getServer().getWorld(world.dimension.getType()))
+					.put(Parameters.POSITION, pos).put(Parameters.TOOL, ItemStack.EMPTY));
+
+			List<ItemStack> remaining = attemptCollect(inv, results);
+			if (remaining.equals(results)) {
+				if (remaining.size() > 0) {
+					spawnResults(world, pos.offset(Direction.UP, 2), remaining);
+				}
+				world.setBlockState(pos.offset(Direction.UP, 2), state.with(crop.getAgeProperty(), 0));
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean harvestBerries(World world, BlockPos pos, BlockState state) {
+		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+		HopperBlockEntity be = (HopperBlockEntity)world.getBlockEntity(pos);
+
+		int age = state.get(SweetBerryBushBlock.AGE);
+		if (age == 3) {
+			int berriesToDrop = 2 + world.random.nextInt(2);
+			List<ItemStack> results = new ArrayList<>();
+			results.add(new ItemStack(Items.SWEET_BERRIES, berriesToDrop));
+			List<ItemStack> remaining = attemptCollect(inv, results);
+			System.out.println(remaining);
+			if (remaining.equals(results)) {
+				if (remaining.size() > 0) {
+					spawnResults(world, pos.offset(Direction.UP, 2), remaining);
+				}
+				world.setBlockState(pos.offset(Direction.UP, 2), state.with(SweetBerryBushBlock.AGE, 1));
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static List<ItemStack> attemptCollect(Inventory inv, List<ItemStack> results) {
+		List<ItemStack> remaining = new ArrayList<>();
+		for (int i = 0; i < results.size(); i++) {
+			ItemStack insert = HopperBlockEntity.transfer(null, inv, results.get(i), null);
+			remaining.add(insert);
+		}
+		return remaining;
+	}
+
+	private static void spawnResults(World world, BlockPos spawnAt, List<ItemStack> toSpawn) {
+		for (int i = 0; i < toSpawn.size(); i++) {
+			world.spawnEntity(new ItemEntity(world, spawnAt.getX(), spawnAt.getY(), spawnAt.getZ(), toSpawn.get(i)));
 		}
 	}
 }
