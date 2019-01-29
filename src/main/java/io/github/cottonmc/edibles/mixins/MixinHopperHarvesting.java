@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.sortme.Hopper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import net.minecraft.world.loot.context.LootContext;
 import net.minecraft.world.loot.context.Parameters;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,14 +26,17 @@ public abstract class MixinHopperHarvesting {
 	@Inject(method = "extract(Lnet/minecraft/sortme/Hopper;)Z", at = @At("HEAD"), cancellable = true)
 	private static void hopperHarvest(Hopper hopper, CallbackInfoReturnable cir) {
 		if (Edibles.config.hopperHarvest) {
+			World world = hopper.getWorld();
 			BlockPos pos = new BlockPos(hopper.getHopperX(), hopper.getHopperY(), hopper.getHopperZ());
-			BlockState state = hopper.getWorld().getBlockState(pos.offset(Direction.UP, 2));
+			BlockState state = world.getBlockState(pos.offset(Direction.UP, 2));
 			if (state.getBlock() instanceof CropBlock) {
 				CropBlock crop = (CropBlock) state.getBlock();
 				if (crop.getCropAgeMaximum() == state.get(crop.getAgeProperty())) {
-					Inventory inv = HopperBlockEntity.getInventoryAt(hopper.getWorld(), pos);
+					Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+
 					int madeTransfers = 0;
-					List<ItemStack> results = state.getDroppedStacks(new LootContext.Builder(hopper.getWorld().getServer().getWorld(hopper.getWorld().dimension.getType()))
+					List<ItemStack> results = state.getDroppedStacks(new LootContext
+							.Builder(world.getServer().getWorld(world.dimension.getType()))
 							.put(Parameters.POSITION, pos).put(Parameters.TOOL, ItemStack.EMPTY));
 					for (int i = 0; i < results.size(); i++) {
 						boolean inserted = false;
@@ -51,12 +55,14 @@ public abstract class MixinHopperHarvesting {
 							}
 						}
 					}
-					if (madeTransfers < results.size()) {
-						for (int i = madeTransfers; i < results.size(); i++) {
-							hopper.getWorld().spawnEntity(new ItemEntity(hopper.getWorld(), pos.getX(), pos.getY() + 2, pos.getZ(), results.get(i)));
+					if (madeTransfers > 0) {
+						if (madeTransfers < results.size()) {
+							for (int i = madeTransfers; i < results.size(); i++) {
+								world.spawnEntity(new ItemEntity(world, pos.getX(), pos.getY() + 2, pos.getZ(), results.get(i)));
+							}
 						}
+						world.setBlockState(pos.offset(Direction.UP, 2), state.with(crop.getAgeProperty(), 0));
 					}
-					hopper.getWorld().setBlockState(pos.offset(Direction.UP, 2), state.with(crop.getAgeProperty(), 0));
 					cir.setReturnValue(true);
 				}
 			}
