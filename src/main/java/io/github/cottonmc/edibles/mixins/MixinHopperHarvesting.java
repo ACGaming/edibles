@@ -3,6 +3,7 @@ package io.github.cottonmc.edibles.mixins;
 import io.github.cottonmc.edibles.Edibles;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
+import net.minecraft.block.GourdBlock;
 import net.minecraft.block.SweetBerryBushBlock;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.ItemEntity;
@@ -36,6 +37,8 @@ public abstract class MixinHopperHarvesting {
 				if (harvestCrop(world, pos, state)) cir.setReturnValue(true);
 			} else if (state.getBlock() instanceof SweetBerryBushBlock) {
 				if (harvestBerries(world, pos, state)) cir.setReturnValue(true);
+			} else if (state.getBlock() instanceof GourdBlock) {
+				if (harvestGourd(world, pos, state)) cir.setReturnValue(true);
 			}
 		}
 	}
@@ -44,9 +47,7 @@ public abstract class MixinHopperHarvesting {
 		CropBlock crop = (CropBlock) state.getBlock();
 		if (crop.getCropAgeMaximum() == state.get(crop.getAgeProperty())) {
 			Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
-			List<ItemStack> results = state.getDroppedStacks(new LootContext
-					.Builder(world.getServer().getWorld(world.dimension.getType()))
-					.put(Parameters.POSITION, pos).put(Parameters.TOOL, ItemStack.EMPTY));
+			List<ItemStack> results = state.getDroppedStacks(getLootContext(world, pos));
 
 			List<ItemStack> remaining = attemptCollect(inv, results);
 			if (remaining.equals(results)) {
@@ -62,7 +63,6 @@ public abstract class MixinHopperHarvesting {
 
 	private static boolean harvestBerries(World world, BlockPos pos, BlockState state) {
 		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
-		HopperBlockEntity be = (HopperBlockEntity)world.getBlockEntity(pos);
 
 		int age = state.get(SweetBerryBushBlock.AGE);
 		if (age == 3) {
@@ -80,6 +80,27 @@ public abstract class MixinHopperHarvesting {
 			}
 		}
 		return false;
+	}
+
+	private static boolean harvestGourd(World world, BlockPos pos, BlockState state) {
+		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+		List<ItemStack> results = state.getDroppedStacks(getLootContext(world, pos));
+
+		List<ItemStack> remaining = attemptCollect(inv, results);
+		if (remaining.equals(results)) {
+			if (remaining.size() > 0) {
+				spawnResults(world, pos.offset(Direction.UP, 2), remaining);
+			}
+			world.breakBlock(pos.offset(Direction.UP, 2), false);
+			return true;
+		}
+		return false;
+	}
+
+	private static LootContext.Builder getLootContext(World world, BlockPos pos) {
+		return new LootContext
+				.Builder(world.getServer().getWorld(world.dimension.getType()))
+				.put(Parameters.POSITION, pos).put(Parameters.TOOL, ItemStack.EMPTY);
 	}
 
 	private static List<ItemStack> attemptCollect(Inventory inv, List<ItemStack> results) {
