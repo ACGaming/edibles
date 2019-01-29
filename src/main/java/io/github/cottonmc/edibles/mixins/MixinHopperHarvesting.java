@@ -1,7 +1,9 @@
 package io.github.cottonmc.edibles.mixins;
 
 import io.github.cottonmc.edibles.Edibles;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.CocoaBlock;
 import net.minecraft.block.CropBlock;
 import net.minecraft.block.GourdBlock;
 import net.minecraft.block.SweetBerryBushBlock;
@@ -11,6 +13,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sortme.Hopper;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -39,6 +42,8 @@ public abstract class MixinHopperHarvesting {
 				if (harvestBerries(world, pos, state)) cir.setReturnValue(true);
 			} else if (state.getBlock() instanceof GourdBlock) {
 				if (harvestGourd(world, pos, state)) cir.setReturnValue(true);
+			} else if (world.getBlockState(pos.offset(Direction.UP)).getBlock().matches(BlockTags.JUNGLE_LOGS)) {
+				if (harvestCocoa(world, pos)) cir.setReturnValue(true);
 			}
 		}
 	}
@@ -48,7 +53,6 @@ public abstract class MixinHopperHarvesting {
 		if (crop.getCropAgeMaximum() == state.get(crop.getAgeProperty())) {
 			Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
 			List<ItemStack> results = state.getDroppedStacks(getLootContext(world, pos));
-
 			List<ItemStack> remaining = attemptCollect(inv, results);
 			if (remaining.equals(results)) {
 				if (remaining.size() > 0) {
@@ -63,14 +67,12 @@ public abstract class MixinHopperHarvesting {
 
 	private static boolean harvestBerries(World world, BlockPos pos, BlockState state) {
 		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
-
 		int age = state.get(SweetBerryBushBlock.AGE);
 		if (age == 3) {
 			int berriesToDrop = 2 + world.random.nextInt(2);
 			List<ItemStack> results = new ArrayList<>();
 			results.add(new ItemStack(Items.SWEET_BERRIES, berriesToDrop));
 			List<ItemStack> remaining = attemptCollect(inv, results);
-			System.out.println(remaining);
 			if (remaining.equals(results)) {
 				if (remaining.size() > 0) {
 					spawnResults(world, pos.offset(Direction.UP, 2), remaining);
@@ -85,7 +87,6 @@ public abstract class MixinHopperHarvesting {
 	private static boolean harvestGourd(World world, BlockPos pos, BlockState state) {
 		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
 		List<ItemStack> results = state.getDroppedStacks(getLootContext(world, pos));
-
 		List<ItemStack> remaining = attemptCollect(inv, results);
 		if (remaining.equals(results)) {
 			if (remaining.size() > 0) {
@@ -95,6 +96,32 @@ public abstract class MixinHopperHarvesting {
 			return true;
 		}
 		return false;
+	}
+
+	private static boolean harvestCocoa(World world, BlockPos pos) {
+		BlockPos logPos = pos.offset(Direction.UP);
+		boolean didHarvest = false;
+		for (Direction dir : Direction.values()) {
+			if (dir == Direction.UP || dir == Direction.DOWN) continue;
+			BlockPos checkPos = logPos.offset(dir);
+			BlockState checkState = world.getBlockState(checkPos);
+			if (checkState.getBlock() == Blocks.COCOA) {
+				int age = checkState.get(CocoaBlock.AGE);
+				if (age == 2) {
+					Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+					List<ItemStack> results = checkState.getDroppedStacks(getLootContext(world, checkPos));
+					List<ItemStack> remaining = attemptCollect(inv, results);
+					if (remaining.equals(results)) {
+						if (remaining.size() > 0) {
+							spawnResults(world, checkPos, remaining);
+						}
+						world.setBlockState(checkPos, checkState.with(CocoaBlock.AGE, 0));
+						didHarvest = true;
+					}
+				}
+			}
+		}
+		return didHarvest;
 	}
 
 	private static LootContext.Builder getLootContext(World world, BlockPos pos) {
