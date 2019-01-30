@@ -24,7 +24,7 @@ public class AddJellyRecipe extends SpecialCraftingRecipe {
 	public boolean matches(CraftingInventory inv, World world) {
 		ItemStack targetFood = ItemStack.EMPTY;
 		ItemStack targetJelly = ItemStack.EMPTY;
-		if (!(inv instanceof CraftingInventory)) return false;
+		if (inv == null) return false;
 		else {
 			for (int i = 0; i < inv.getInvSize(); i++) {
 				ItemStack stack = inv.getInvStack(i);
@@ -42,7 +42,6 @@ public class AddJellyRecipe extends SpecialCraftingRecipe {
 				}
 			}
 		}
-//		if (!targetFood.hasTag()) targetFood.setTag(new CompoundTag());
 		if (!targetJelly.isEmpty()) jelly = targetJelly;
 		return (!targetFood.hasTag() || (!targetFood.getTag().containsKey("jellied") && !targetFood.getTag().containsKey("super_jellied"))) && !targetJelly.isEmpty();
 	}

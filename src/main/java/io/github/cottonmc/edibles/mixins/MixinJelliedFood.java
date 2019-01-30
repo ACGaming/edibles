@@ -30,11 +30,10 @@ public class MixinJelliedFood extends Item {
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getHungerManager()Lnet/minecraft/entity/player/HungerManager;"))
 	public void eatJelliedFood(ItemStack stack, World world, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir) {
 		if (stack.hasTag()) {
+			PlayerEntity player = (PlayerEntity)entity;
 			if (stack.getTag().containsKey("jellied")) {
-				PlayerEntity player = (PlayerEntity)entity;
 				player.getHungerManager().add(2, 0.5f);
 			} else if (stack.getTag().containsKey("super_jellied")) {
-				PlayerEntity player = (PlayerEntity)entity;
 				player.getHungerManager().add(4, 0.6f);
 				player.addPotionEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 1200, 1));
 			}

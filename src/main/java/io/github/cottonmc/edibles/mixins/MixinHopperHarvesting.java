@@ -1,11 +1,11 @@
 package io.github.cottonmc.edibles.mixins;
 
 import io.github.cottonmc.edibles.Edibles;
+import net.minecraft.block.AttachedStemBlock;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CocoaBlock;
 import net.minecraft.block.CropBlock;
-import net.minecraft.block.GourdBlock;
 import net.minecraft.block.SweetBerryBushBlock;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.ItemEntity;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(HopperBlockEntity.class)
-public abstract class MixinHopperHarvesting {
+public class MixinHopperHarvesting {
 
 	@Inject(method = "extract(Lnet/minecraft/sortme/Hopper;)Z", at = @At("HEAD"), cancellable = true)
 	private static void hopperHarvest(Hopper hopper, CallbackInfoReturnable cir) {
@@ -40,8 +40,8 @@ public abstract class MixinHopperHarvesting {
 				if (harvestCrop(world, pos, state)) cir.setReturnValue(true);
 			} else if (state.getBlock() instanceof SweetBerryBushBlock) {
 				if (harvestBerries(world, pos, state)) cir.setReturnValue(true);
-			} else if (state.getBlock() instanceof GourdBlock) {
-				if (harvestGourd(world, pos, state)) cir.setReturnValue(true);
+			} else if (state.getBlock() instanceof AttachedStemBlock) {
+				if (harvestGourd(world, pos)) cir.setReturnValue(true);
 			} else if (world.getBlockState(pos.offset(Direction.UP)).getBlock().matches(BlockTags.JUNGLE_LOGS)) {
 				if (harvestCocoa(world, pos)) cir.setReturnValue(true);
 			}
@@ -84,15 +84,19 @@ public abstract class MixinHopperHarvesting {
 		return false;
 	}
 
-	private static boolean harvestGourd(World world, BlockPos pos, BlockState state) {
+	private static boolean harvestGourd(World world, BlockPos pos) {
 		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+		BlockPos stemPos = pos.offset(Direction.UP, 2);
+		BlockState stem = world.getBlockState(stemPos);
+		BlockPos gourdPos = stemPos.offset(stem.get(AttachedStemBlock.FACING));
+		BlockState state = world.getBlockState(gourdPos);
 		List<ItemStack> results = state.getDroppedStacks(getLootContext(world, pos));
 		List<ItemStack> remaining = attemptCollect(inv, results);
 		if (remaining.equals(results)) {
 			if (remaining.size() > 0) {
-				spawnResults(world, pos.offset(Direction.UP, 2), remaining);
+				spawnResults(world, gourdPos, remaining);
 			}
-			world.breakBlock(pos.offset(Direction.UP, 2), false);
+			world.breakBlock(gourdPos, false);
 			return true;
 		}
 		return false;
