@@ -27,16 +27,14 @@ public class MixinJelliedFood extends Item {
 	}
 
 	@Inject(method = "onItemFinishedUsing",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getHungerManager()Lnet/minecraft/entity/player/HungerManager;"),
-//			locals = LocalCapture.CAPTURE_FAILEXCEPTION,
-			remap = false)
-	public void eatJelliedFood(ItemStack itemStack_1, World world_1, LivingEntity livingEntity_1, CallbackInfoReturnable<ItemStack> cir) {
-		if (itemStack_1.hasTag()) {
-			if (itemStack_1.getTag().containsKey("jellied")) {
-				PlayerEntity player = (PlayerEntity)livingEntity_1;
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getHungerManager()Lnet/minecraft/entity/player/HungerManager;"))
+	public void eatJelliedFood(ItemStack stack, World world, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir) {
+		if (stack.hasTag()) {
+			if (stack.getTag().containsKey("jellied")) {
+				PlayerEntity player = (PlayerEntity)entity;
 				player.getHungerManager().add(2, 0.5f);
-			} else if (itemStack_1.getTag().containsKey("super_jellied")) {
-				PlayerEntity player = (PlayerEntity)livingEntity_1;
+			} else if (stack.getTag().containsKey("super_jellied")) {
+				PlayerEntity player = (PlayerEntity)entity;
 				player.getHungerManager().add(4, 0.6f);
 				player.addPotionEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 1200, 1));
 			}
