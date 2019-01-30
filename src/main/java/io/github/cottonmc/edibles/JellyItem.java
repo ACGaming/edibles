@@ -6,8 +6,8 @@ import net.minecraft.item.*;
 import net.minecraft.world.World;
 
 public class JellyItem extends FoodItem {
-	public JellyItem() {
-		super(1, 0.25f, false, new Item.Settings().itemGroup(ItemGroup.FOOD).recipeRemainder(Items.GLASS_BOTTLE));
+	public JellyItem(int hunger, float saturation) {
+		super(hunger, saturation, false, new Item.Settings().itemGroup(ItemGroup.FOOD).recipeRemainder(Items.GLASS_BOTTLE));
 	}
 
 	@Override
@@ -19,5 +19,10 @@ public class JellyItem extends FoodItem {
 			return stack;
 		}
 		else return new ItemStack(Items.GLASS_BOTTLE);
+	}
+
+	@Override
+	public boolean hasEnchantmentGlow(ItemStack stack) {
+		return stack.getItem() == Edibles.SUPER_JELLY;
 	}
 }

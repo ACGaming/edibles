@@ -1,7 +1,6 @@
 package io.github.cottonmc.edibles;
 
 import blue.endless.jankson.Jankson;
-import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.impl.SyntaxError;
 import net.fabricmc.loader.FabricLoader;

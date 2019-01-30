@@ -2,6 +2,8 @@ package io.github.cottonmc.edibles.mixins;
 
 import net.minecraft.client.item.TooltipOptions;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.FoodItem;
 import net.minecraft.item.Item;
@@ -33,6 +35,10 @@ public class MixinJelliedFood extends Item {
 			if (itemStack_1.getTag().containsKey("jellied")) {
 				PlayerEntity player = (PlayerEntity)livingEntity_1;
 				player.getHungerManager().add(2, 0.5f);
+			} else if (itemStack_1.getTag().containsKey("super_jellied")) {
+				PlayerEntity player = (PlayerEntity)livingEntity_1;
+				player.getHungerManager().add(4, 0.6f);
+				player.addPotionEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 1200, 1));
 			}
 		}
 	}
@@ -41,7 +47,9 @@ public class MixinJelliedFood extends Item {
 	public void buildTooltip(ItemStack stack, World world, List<TextComponent> tooltips, TooltipOptions tooltipOptions) {
 		if (stack.hasTag())  {
 			if (stack.getTag().containsKey("jellied")) {
-				tooltips.add(new TranslatableTextComponent("tooltip.edibles.jellied").applyFormat(TextFormat.GRAY));
+				tooltips.add(new TranslatableTextComponent("tooltip.edibles.jellied").applyFormat(TextFormat.DARK_RED));
+			} else if (stack.getTag().containsKey("super_jellied")) {
+				tooltips.add(new TranslatableTextComponent("tooltip.edibles.super_jellied").applyFormat(TextFormat.GREEN));
 			}
 		}
 		super.buildTooltip(stack, world, tooltips, tooltipOptions);

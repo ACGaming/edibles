@@ -1,4 +1,6 @@
 {
   "item.edibles.jelly": "Jelly",
-  "tooltip.edibles.jellied": "Jellied"
+  "item.edibles.super_jelly": "Super-Jelly",
+  "tooltip.edibles.jellied": "Jellied",
+  "tooltip.edibles.super_jellied": "Super-Jellied"
 }

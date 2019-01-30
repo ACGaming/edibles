@@ -2,6 +2,7 @@ package io.github.cottonmc.edibles;
 
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.FoodItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.recipe.RecipeSerializer;
@@ -13,6 +14,7 @@ import net.minecraft.world.World;
 public class AddJellyRecipe extends SpecialCraftingRecipe {
 
 	private int foodSlot = 0;
+	ItemStack jelly = ItemStack.EMPTY;
 
 	public AddJellyRecipe(Identifier id) {
 		super(id);
@@ -21,19 +23,19 @@ public class AddJellyRecipe extends SpecialCraftingRecipe {
 	@Override
 	public boolean matches(CraftingInventory inv, World world) {
 		ItemStack targetFood = ItemStack.EMPTY;
-		boolean hasJelly = false;
+		ItemStack targetJelly = ItemStack.EMPTY;
 		if (!(inv instanceof CraftingInventory)) return false;
 		else {
 			for (int i = 0; i < inv.getInvSize(); i++) {
 				ItemStack stack = inv.getInvStack(i);
 				if (!stack.isEmpty()) {
-					if (stack.getItem() instanceof FoodItem) {
+					if (stack.getItem() instanceof FoodItem && !(stack.getItem() instanceof JellyItem)) {
 						if (!targetFood.isEmpty()) return false;
 						targetFood = stack;
 						foodSlot = i;
-					} else if (stack.getItem() == Edibles.JELLY) {
-						if (hasJelly) return false;
-						hasJelly = true;
+					} else if (stack.getItem() instanceof JellyItem) {
+						if (!targetJelly.isEmpty()) return false;
+						targetJelly = stack;
 					} else {
 						return false;
 					}
@@ -41,7 +43,8 @@ public class AddJellyRecipe extends SpecialCraftingRecipe {
 			}
 		}
 //		if (!targetFood.hasTag()) targetFood.setTag(new CompoundTag());
-		return (!targetFood.hasTag() || !targetFood.getTag().containsKey("jellied")) && hasJelly;
+		if (!targetJelly.isEmpty()) jelly = targetJelly;
+		return (!targetFood.hasTag() || (!targetFood.getTag().containsKey("jellied") && !targetFood.getTag().containsKey("super_jellied"))) && !targetJelly.isEmpty();
 	}
 
 	@Override
@@ -49,7 +52,8 @@ public class AddJellyRecipe extends SpecialCraftingRecipe {
 		ItemStack food = inv.getInvStack(foodSlot).copy();
 		if (!food.hasTag()) food.setTag(new CompoundTag());
 		CompoundTag tag = food.getTag().copy();
-		tag.putByte("jellied", (byte)0);
+		if (jelly.getItem() == Edibles.SUPER_JELLY) tag.putByte("super_jellied", (byte)0);
+		else tag.putByte("jellied", (byte)0);
 		food.setTag(tag);
 		return food;
 	}
