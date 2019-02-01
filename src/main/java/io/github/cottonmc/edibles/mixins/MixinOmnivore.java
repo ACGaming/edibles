@@ -75,7 +75,11 @@ public class MixinOmnivore {
 				world.createExplosion(null, entity.x, entity.y+1, entity.z, 1.5f, false);
 			}
 
-			int damage = Edibles.config.omnivoreItemDamage;
+			double damageConf = Edibles.config.omnivoreItemDamage;
+			int damage = (int)damageConf;
+			if (damageConf < 1 && damageConf > 0) {
+				damage = (int)Math.ceil(damageConf*stack.getItem().getDurability());
+			}
 			if (stack.hasDurability() && damage > 0) stack.applyDamage(damage, entity);
 			else stack.subtractAmount(1);
 			cir.setReturnValue(stack);

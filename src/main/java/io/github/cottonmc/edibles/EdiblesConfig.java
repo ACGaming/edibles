@@ -24,8 +24,9 @@ public class EdiblesConfig {
 	public float omnivoreSaturationRestore = 0.25f;
 
 	@Comment(value = "How much damage an item with durability should take when you eat it.\n" +
-			"Should be an integer value above 0.\n" +
+			"Should be an integer value above 0, or a decimal value from 0 to 1.\n" +
+			"A decimal value will be used to calculate what percentage of an item's damage to consume.\n" +
 			"Set to 0 to disable.")
-	public int omnivoreItemDamage = 30;
+	public double omnivoreItemDamage = 30;
 
 }

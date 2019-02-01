@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "edibles:jelly_make"
+    ]
+  },
+  "criteria": {
+    "has_berries": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:sweet_berries"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "edibles:jelly_make"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_berries",
+      "has_the_recipe"
+    ]
+  ]
+}
