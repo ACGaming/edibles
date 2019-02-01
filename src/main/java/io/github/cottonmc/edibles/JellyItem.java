@@ -22,7 +22,8 @@ public class JellyItem extends FoodItem {
 	}
 
 	@Override
-	public boolean hasEnchantmentGlow(ItemStack stack) {
+	public boolean hasEnchantmentGlint(ItemStack stack) {
 		return stack.getItem() == Edibles.SUPER_JELLY;
 	}
+
 }

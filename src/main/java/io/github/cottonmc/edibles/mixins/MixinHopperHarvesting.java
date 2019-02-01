@@ -18,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.loot.context.LootContext;
-import net.minecraft.world.loot.context.Parameters;
+import net.minecraft.world.loot.context.LootContextParameters;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -131,7 +131,7 @@ public class MixinHopperHarvesting {
 	private static LootContext.Builder getLootContext(World world, BlockPos pos) {
 		return new LootContext
 				.Builder(world.getServer().getWorld(world.dimension.getType()))
-				.put(Parameters.POSITION, pos).put(Parameters.TOOL, ItemStack.EMPTY);
+				.put(LootContextParameters.POSITION, pos).put(LootContextParameters.TOOL, ItemStack.EMPTY);
 	}
 
 	private static List<ItemStack> attemptCollect(Inventory inv, List<ItemStack> results) {

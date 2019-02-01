@@ -25,7 +25,7 @@ targetCompatibility = 1.8
 
 archivesBaseName = "edibles"
 group = "io.github.cottonmc"
-version = "1.0.0+19w04b"
+version = "1.0.0+19w05a"
 
 minecraft {
 	refmapName = 'mixins.edibles.refmap.json'
@@ -37,9 +37,9 @@ repositories {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:19w04b"
-	mappings "net.fabricmc:yarn:19w04b.2"
-	modCompile "net.fabricmc:fabric-loader:0.3.3.102"
-	modCompile "net.fabricmc:fabric:0.1.4.79"
+	minecraft "com.mojang:minecraft:19w05a"
+	mappings "net.fabricmc:yarn:19w05a.6"
+	modCompile "net.fabricmc:fabric-loader:0.3.4.104"
+	modCompile "net.fabricmc:fabric:0.1.5.86"
 	shadow "blue.endless:jankson:1.1.1-SNAPSHOT"
 }
