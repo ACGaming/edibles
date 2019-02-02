@@ -18,10 +18,12 @@ Edibles adds a few food-related features to Fabric for Minecraft 1.14. Included:
     - For pumpkin/melon-style crops, the hopper goes under the farmland the stem is on.
     - For cocoa beans, the hopper goes under the log the cocoa bean is on.
     - For sweet berries, the hopper goes under the grass/dirt the bush is on.
+- Nether wart can be grown using bone meal.
 - Cake can be eaten without being placed on the ground to restore a cake's worth of hunger at once.
     - Hold right-click in the air to do this, or it'll place down.
 - Glistering melons can now be eaten to instantly recover one heart.
 - Iron and gold nuggets can be eaten. (configurable, off by default)
+    - Each have their own hunger and saturation restoration separate to the Omnivore feature (below) when this is active.
 - Any block or item without a right-click-in-the-air action can be eaten. (configurable, off by default)
     - The amount of hunger and saturation gained is configurable and standard.
     - Items with durability will have a configurable amount of durability consumed instead of destroying the item instantly.
