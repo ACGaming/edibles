@@ -43,6 +43,7 @@ public class AddJellyRecipe extends SpecialCraftingRecipe {
 			}
 		}
 		if (!targetJelly.isEmpty()) jelly = targetJelly;
+		if (targetFood.getItem() instanceof SpecialFoodItem && !Edibles.config.edibleNuggets) return false;
 		return (!targetFood.hasTag() || (!targetFood.getTag().containsKey("jellied") && !targetFood.getTag().containsKey("super_jellied"))) && !targetJelly.isEmpty();
 	}
 

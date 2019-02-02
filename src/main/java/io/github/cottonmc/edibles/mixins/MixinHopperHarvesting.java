@@ -1,12 +1,7 @@
 package io.github.cottonmc.edibles.mixins;
 
 import io.github.cottonmc.edibles.Edibles;
-import net.minecraft.block.AttachedStemBlock;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CocoaBlock;
-import net.minecraft.block.CropBlock;
-import net.minecraft.block.SweetBerryBushBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.inventory.Inventory;
@@ -44,6 +39,9 @@ public class MixinHopperHarvesting {
 				if (harvestGourd(world, pos)) cir.setReturnValue(true);
 			} else if (world.getBlockState(pos.offset(Direction.UP)).getBlock().matches(BlockTags.JUNGLE_LOGS)) {
 				if (harvestCocoa(world, pos)) cir.setReturnValue(true);
+			} else if (state.getBlock() instanceof NetherWartBlock) {
+				//Apparently this isn't an instanceof CropBlock so I gotta do this manually. Thanks, Mojang.
+				if (harvestNetherWart(world, pos, state)) cir.setReturnValue(true);
 			}
 		}
 	}
@@ -126,6 +124,22 @@ public class MixinHopperHarvesting {
 			}
 		}
 		return didHarvest;
+	}
+
+	private static boolean harvestNetherWart(World world, BlockPos pos, BlockState state) {
+		if (state.get(NetherWartBlock.AGE) == 3) {
+			Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+			List<ItemStack> results = state.getDroppedStacks(getLootContext(world, pos));
+			List<ItemStack> remaining = attemptCollect(inv, results);
+			if (remaining.equals(results)) {
+				if (remaining.size() > 0) {
+					spawnResults(world, pos.offset(Direction.UP, 2), remaining);
+				}
+				world.setBlockState(pos.offset(Direction.UP, 2), state.with(NetherWartBlock.AGE, 0));
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static LootContext.Builder getLootContext(World world, BlockPos pos) {
