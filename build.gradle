@@ -44,3 +44,13 @@ dependencies {
 	shadow "blue.endless:jankson:1.1.1-SNAPSHOT"
 	implementation "blue.endless:jankson:1.1.1-SNAPSHOT"
 }
+
+jar {
+	dependsOn shadowJar
+	classifier = "slim"
+}
+
+shadowJar {
+	classifier = ""
+	configurations = [project.configurations.shadow]
+}
