@@ -46,11 +46,15 @@ dependencies {
 }
 
 jar {
-	dependsOn shadowJar
 	classifier = "slim"
 }
 
 shadowJar {
-	classifier = ""
+	classifier = "shadow"
 	configurations = [project.configurations.shadow]
+}
+
+remapJar {
+	jar = shadowJar.archivePath
+	dependsOn shadowJar
 }
